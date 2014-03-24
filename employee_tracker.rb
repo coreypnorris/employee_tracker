@@ -2,6 +2,7 @@ require 'active_record'
 
 require './lib/division'
 require './lib/employee'
+require './lib/project'
 
 database_configurations = YAML::load(File.open('./db/config.yml'))
 development_configuration = database_configurations['development']
@@ -16,7 +17,8 @@ def menu
   choice = nil
   until choice == 'e'
     puts "Press 'e' to go to the employee menu."
-    puts "Press 'd' to to the divisions menu"
+    puts "Press 'd' to go the divisions menu"
+    puts "Press 'p' to go to the projects menu"
     puts "Press 'e' to exit the program."
     choice = gets.chomp
     case choice
@@ -24,6 +26,8 @@ def menu
       employees
     when 'd'
       divisions
+    when 'p'
+      projects
     when 'e'
       puts "goodbye!"
     else
@@ -131,6 +135,79 @@ def list_divisions
   select_division = Division.where({:name => division_choice}).first
   select_division.employees.each { |employee| puts employee.name }
 end
+
+def projects
+  puts "Press 'a' to add a new project"
+  puts "Press 'v' to view current projects and employees working on them"
+  puts "Press 'e' to add an employee to a project"
+  puts "press 'b' to go back"
+  input = gets.chomp
+  case input
+  when 'a'
+    new_project
+  when 'v'
+    view_projects
+  when 'b'
+    menu
+  when 'e'
+    add_employee
+  else
+    puts "That isn't a valid option"
+  end
+end
+
+def new_project
+  puts "Enter the name of the new project"
+  name_input = gets.chomp
+  puts "Entere the description of the project"
+  describe_input = gets.chomp
+  project = Project.new(:name => name_input, :description => describe_input)
+  project.save
+  puts "'#{name_input}' has been added to the project list"
+  projects
+end
+
+def view_projects
+  project_list = Project.all
+  project_list.each { |projects| puts projects.name + ": " + projects.description + "\n\n" }
+  puts "Select a project to view its employees"
+  project_choice = gets.chomp
+  select_project = Project.where({:name => project_choice}).first
+  select_project.employees.each { |employee| puts employee.name}
+  puts "Would you like to go back to the main menu? 'y' or 'n'"
+  input = gets.chomp
+  case input
+  when 'y'
+    menu
+  when 'n'
+    puts "Goodbye!"
+  else
+    puts "That is not a valid option"
+  end
+end
+
+def add_employee
+  puts "Choose your project to add an employee too"
+  project_list = Project.all
+  project_list.each { |projects| puts projects.name}
+  project_input = gets.chomp
+  project_id = Project.find_by name: project_input
+  puts "Choose an employee to add to the project '#{project_input}'"
+  employee_list = Employee.all
+  employee_list.each { |employees| puts employees.name}
+  employee_input = gets.chomp
+  employee = Employee.where({:name => employee_input}).first
+  employee.update({:project_id => project_id.id})
+  puts "'#{employee_input}' has been added to '#{project_input}' "
+  menu
+end
+
+
+
+
+
+
+
 
 welcome
 
