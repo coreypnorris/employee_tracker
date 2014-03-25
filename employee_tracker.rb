@@ -38,6 +38,7 @@ end
 def employees
   puts "Enter 'a' to add a new employee"
   puts "Enter 'v' to view current employees"
+  # puts "Enter 'p' to view a particular employeed"
   puts "Enter 'd' to delete an employee"
   puts "Enter 'b' to go back"
   input = gets.chomp
@@ -47,7 +48,7 @@ def employees
   when 'v'
     list_employees
   when 'd'
-    delete_employees
+    delete_employee
   when 'b'
     menu
   else
@@ -74,9 +75,6 @@ def divisions
   end
 end
 def add_employee
-  # if Division.all.length <= 0
-  #   puts "Create a division first."
-  # end
   puts "What is the name of the new employee?"
   name = gets.chomp
   puts "What division does the employee belong too?"
@@ -140,6 +138,8 @@ def projects
   puts "Press 'a' to add a new project"
   puts "Press 'v' to view current projects and employees working on them"
   puts "Press 'e' to add an employee to a project"
+  puts "Press 'c' to complete a project"
+  puts "press 'd' to delete a project"
   puts "press 'b' to go back"
   input = gets.chomp
   case input
@@ -151,6 +151,10 @@ def projects
     menu
   when 'e'
     add_employee
+  when 'c'
+    complete_project
+  when 'd'
+    delete_project
   else
     puts "That isn't a valid option"
   end
@@ -202,8 +206,48 @@ def add_employee
   menu
 end
 
+def complete_project
+  puts "Which project would you like to complete?"
+  Project.all.each_with_index do |project, index|
+    puts "#{index+1}) '#{project.name}'"
+  end
+  project_to_complete = gets.chomp.to_i
+  Project.all[project_to_complete-1].update_attributes(:done => false)
+  completed_project = Project.all[project_to_complete-1]
+  puts "'#{completed_project.done}'"
+end
 
+def delete_project
+  puts "Which project would you like to delete"
+  Project.all.each_with_index do |project, index|
+    puts "#{index+1}) '#{project.name}'"
+  end
+  project_to_delete = gets.chomp.to_i
+  Project.all[project_to_delete-1].destroy
+  puts "The project has been deleted."
+end
 
+def delete_divisions
+  puts "Which division would you like to delete"
+  Division.all.each_with_index do |division, index|
+    puts "#{index+1}) '#{division.name}'"
+  end
+  division_to_delete = gets.chomp.to_i
+  Division.all[division_to_delete-1].destroy
+  puts "The division has been deleted."
+  menu
+end
+
+def delete_employee
+  puts "Which employee would you like to delete?"
+  Employee.all.each_with_index do |employee, index|
+    puts "#{index+1}) '#{employee.name}'"
+  end
+  employee_to_delete = gets.chomp.to_i
+  Employee.all[employee_to_delete-1].destroy
+  puts "The employee has been deleted."
+  menu
+end
 
 
 
